@@ -28,7 +28,7 @@ module.exports = async function () {
     choices: imageFiles,
   });
 
-  const cmd = ffmpeg().input(audioFile);
+  const cmd = ffmpeg();
 
   const { useCuda } = await prompt({
     type: "confirm",

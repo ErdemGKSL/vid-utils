@@ -1,6 +1,6 @@
 {
   "name": "vid-utils",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Video and subtitle command line utils",
   "main": "index.js",
   "dependencies": {
