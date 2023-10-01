@@ -6,6 +6,8 @@ module.exports = async function () {
 
   const files = (await fs.promises.readdir(".")).filter((f) => f.endsWith(".srt"));
 
+  if (!files.length) throw new Error("No srt files found");
+
   const { file } = await prompt({
     type: "select",
     name: "file",

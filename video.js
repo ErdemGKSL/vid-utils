@@ -10,6 +10,8 @@ module.exports = async function () {
     f.endsWith(".mp4") || f.endsWith(".mkv") || f.endsWith(".avi") || f.endsWith(".mov")
   );
 
+  if (!videoFiles.length) throw new Error("No video files found");
+
   const { videoFile } = await prompt({
     type: "select",
     name: "videoFile",
@@ -24,6 +26,9 @@ module.exports = async function () {
   });
 
   const srtFiles = (await fs.promises.readdir(".")).filter((f) => f.endsWith(".srt"));
+
+  if (useSrt && !srtFiles.length) throw new Error("No srt files found");
+
   const { srtFile } = useSrt ? await prompt({
     type: "select",
     name: "srtFile",
