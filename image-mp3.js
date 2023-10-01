@@ -30,22 +30,20 @@ module.exports = async function () {
 
   const cmd = ffmpeg();
 
-  const { useCuda } = await prompt({
-    type: "confirm",
-    name: "useCuda",
-    message: "Use CUDA?",
-  });
-
-  if (useCuda) cmd.inputOptions([
-    '-hwaccel cuda'
-  ]);
-
-  const { outputFormat } = await prompt({
+  const { quality } = await prompt({
     type: "select",
-    name: "outputFormat",
-    message: "Select output format",
-    choices: ['mp4', 'mkv', 'avi', 'mov'],
+    name: "quality",
+    message: "Select audio quality",
+    choices: ['low', 'medium', 'high', 'very high', 'ultra'],
   });
+
+  const qualityMap = {
+    'low': '50k',
+    'medium': '100k',
+    'high': '192k',
+    'very high': '320k',
+    'ultra': '500k'
+  }
   
   const { outputFileName } = await prompt({
     type: "input",
@@ -54,31 +52,30 @@ module.exports = async function () {
     initial: "output",
   });
 
-  const { quality } = await prompt({
+  const { outputFormat } = await prompt({
     type: "select",
-    name: "quality",
-    message: "Select quality",
-    choices: ['low', 'medium', 'high', 'very high', 'ultra'],
+    name: "outputFormat",
+    message: "Select output format",
+    choices: ['mp4', 'mkv', 'avi', 'mov'],
   });
-
-  const qualityMap = {
-    'low': '50k',
-    'medium': '400k',
-    'high': '1000k',
-    'very high': '6000k',
-    'ultra': '18000k'
-  }
 
   await new Promise((res, rej) => {
     let command;
     cmd
       .input(imageFile)
-      .input(audioFile)
-      .outputOptions([
-        '-acodec copy',
-        '-b:v ' + qualityMap[quality],
-        '-bt 50k',
+      .inputOptions([
+        '-loop 1'
       ])
+      .input(audioFile)
+      .videoCodec('libx264')
+      .outputOptions([
+        '-tune stillimage',
+        // '-c:a aac',
+        `-b:a ${qualityMap[quality]}`,
+        '-pix_fmt yuv420p',
+        '-shortest'
+      ])
+      .audioCodec('aac')
       .output(`${outputFileName}.${outputFormat}`)
       .on('start', (commandLine) => {
         command = commandLine;
